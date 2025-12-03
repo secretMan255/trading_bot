@@ -1,6 +1,8 @@
-import { Body, Controller, Post, UnauthorizedException } from '@nestjs/common'
+import { Body, Controller, Post, UnauthorizedException, UseGuards, UsePipes } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { BitgetService } from './bitget.service'
+import { validatePipe } from 'src/utils'
+import { PlaceOrderDto } from './webhook.dto'
 
 @Controller('tv-webhook')
 export class WebhookController {
@@ -14,13 +16,15 @@ export class WebhookController {
     }
 
     @Post()
-    async onSignal(@Body() body: any) {
+    // @UseGuards()
+    @UsePipes(validatePipe)
+    async onSignal(@Body() body: PlaceOrderDto) {
         if (body.secret !== this.secret) throw new UnauthorizedException('Invalid Secret')
 
         const res = await this.bitgetService.placeOrder({
-            symbol: body.symbol || 'BTCUSDT_UMCBL',
-            side: body.side === 'BUY' ? 'buy' : 'sell',
-            size: Number(body.qty || 0.01)
+            symbol: body.symbol,
+            side: body.side,
+            size: Number(body.qty)
         })
 
         return { status: 0, bitget: res }

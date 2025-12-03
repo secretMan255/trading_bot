@@ -5,6 +5,7 @@ import { MysqlModule } from './modules';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { WebhookModule } from './webhook/webhook.model';
 
 
 @Module({
@@ -22,7 +23,8 @@ import { ThrottlerModule } from '@nestjs/throttler';
       envFilePath: ['.env.local', '.env'],
     }),
     ScheduleModule.forRoot(),
-    MysqlModule
+    MysqlModule,
+    WebhookModule
   ],
   controllers: [AppController],
   providers: [AppService],
