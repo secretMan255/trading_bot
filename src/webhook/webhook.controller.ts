@@ -2,7 +2,7 @@ import { Body, Controller, Get, Param, Post, UnauthorizedException, UseGuards, U
 import { ConfigService } from '@nestjs/config'
 import { BitgetService } from './bitget.service'
 import { validatePipe } from 'src/utils'
-import { GetTransactionDto, PlaceOrderDto } from './webhook.dto'
+import { GetTransactionsDto, PlaceOrderDto } from './webhook.dto'
 import { JwtAuthGuard } from 'src/guard/auth/jwt.auth.guard'
 
 @Controller('bitget')
@@ -19,8 +19,17 @@ export class WebhookController {
     @Get('transactions/spot')
     @UseGuards(JwtAuthGuard)
     @UsePipes(validatePipe)
-    async getSpotTransactions(@Param() params: GetTransactionDto) {
+    async getSpotTransactions(@Param() params: GetTransactionsDto) {
         const res = await this.bitgetService.getSpotTransactions(params)
+
+        return { status: 0, data: res }
+    }
+
+    @Get('transactions/future')
+    @UseGuards(JwtAuthGuard)
+    @UsePipes(validatePipe)
+    async getFutureTransactions(@Param() params: GetTransactionsDto) {
+        const res = await this.bitgetService.getFutureTransactions(params)
 
         return { status: 0, data: res }
     }

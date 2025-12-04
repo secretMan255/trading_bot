@@ -23,7 +23,15 @@ export interface PlaceOrder {
     size: number
 }
 
-export class GetTransactionDto {
+export class GetTransactionsDto {
+    @IsString()
+    @IsOptional()
+    productType: string
+
+    @IsString()
+    @IsOptional()
+    marginCoin: string
+
     @IsString()
     @IsOptional()
     coin: string

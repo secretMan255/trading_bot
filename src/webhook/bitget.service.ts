@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 import * as crypto from 'crypto'
-import { GetTransactionDto, PlaceOrder } from './webhook.dto';
+import { GetTransactionsDto, PlaceOrder } from './webhook.dto';
 
 @Injectable()
 export class BitgetService {
@@ -23,7 +23,7 @@ export class BitgetService {
         return crypto.createHmac('sha256', this.secret).update(`${timestamp}${method.toUpperCase()}${requestPath}${body}`).digest('base64')
     }
 
-    public async getSpotTransactions(params: GetTransactionDto) {
+    public async getSpotTransactions(params: GetTransactionsDto) {
         const requestPath: string = '/api/v2/tax/spot-record'
 
         const query: Record<string, string> = {
@@ -43,6 +43,37 @@ export class BitgetService {
             'ACCESS-SIGN': this.sign(timestamp, 'GET', pathForSign, ''),
             'ACCESS-TIMESTAMP': timestamp,
             'ACCESS-PASSPHRASE': this.passphrase,
+            'locate': 'en-US',
+            'Content-Type': 'application/json'
+        }
+
+        const res = await axios.get(`${this.baseUrl}${pathForSign}`, { headers })
+        return res.data
+    }
+
+    public async getFutureTransactions(params: GetTransactionsDto) {
+        const requestPath: string = '/api/v2/tax/future-record'
+
+        const query: Record<string, string> = {
+            startTime: params.startTime,
+            endTime: params.endTime
+        }
+
+        if (params.productType) query.productType = params.productType
+        if (params.marginCoin) query.marginCoin = params.marginCoin
+        if (params.limit) query.limit = params.limit
+        if (params.idLessThan) query.idLessThan = params.idLessThan
+
+        const queryString: string = new URLSearchParams(query).toString()
+        const pathForSign: string = `${requestPath}?${queryString}`
+        const timestamp: string = Date.now().toString()
+
+        const headers: Record<string, string> = {
+            'ACCESS-KEY': this.apiKey,
+            'ACCESS-SIGN': this.sign(timestamp, 'GET', pathForSign, ''),
+            'ACCESS-TIMESTAMP': timestamp,
+            'ACCESS-PASSPHRASE': this.passphrase,
+            'locate': 'en-US',
             'Content-Type': 'application/json'
         }
 
