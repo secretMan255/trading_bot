@@ -14,7 +14,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
         super({
             jwtFromRequest: ExtractJwt.fromExtractors([
-                (req: Request) => req?.cookies?.['liangliang_access_token'] || null,
+                (req: Request) => req?.cookies?.['access_token'] || null,
                 (req: Request) => {
                     const auth = req?.headers?.authorization;
                     if (!auth) return null;
