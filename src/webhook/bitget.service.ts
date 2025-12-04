@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 import * as crypto from 'crypto'
+import { PlaceOrder } from './webhook.dto';
 
 @Injectable()
 export class BitgetService {
@@ -22,7 +23,7 @@ export class BitgetService {
         return crypto.createHmac('sha256', this.secret).update(`${timestamp}${method}${requestPath}${body}`).digest('base64')
     }
 
-    async placeOrder({ symbol, side, size }: { symbol: string, side: 'buy' | 'sell', size: number }) {
+    public async placeFutureOrder({ symbol, side, orderType, size }: PlaceOrder) {
         const requestPath: string = '/api/mix/v1/order/placeOrder'
         const url: string = this.baseUrl + requestPath
         const timestamp: string = Date.now().toString()
@@ -32,7 +33,7 @@ export class BitgetService {
             marginCoin: 'USDT',
             size: size.toString(),
             side,
-            orderType: 'market',
+            orderType,
             productType: 'UMCBL'
         }
 
@@ -41,6 +42,31 @@ export class BitgetService {
             'ACCESS-SIGN': this.sign(timestamp, 'POST', requestPath, JSON.stringify(bodyObj)),
             'ACCESS-TIMESTAMP': timestamp,
             'ACCESS-PASSPHRASE': this.passphrase,
+            'Content-Type': 'application/json'
+        }
+
+        const res = await axios.post(url, bodyObj, { headers })
+        return res.data
+    }
+
+    public async placeSpotORder({ symbol, side, orderType, size }: PlaceOrder) {
+        const requestPath: string = '/api/spot/v1/trade/placeOrder'
+        const url: string = this.baseUrl + requestPath
+        const timestamp: string = Date.now().toString()
+
+        const bodyObj: Record<string, string> = {
+            symbol,
+            side,
+            orderType,
+            force: 'gtc',
+            quantity: size.toString()
+        }
+
+        const headers: Record<string, string> = {
+            'ACCESS-KEY': this.apiKey,
+            'ACCESS-SIGN': this.sign(timestamp, 'POST', requestPath, JSON.stringify(bodyObj)),
+            'ACCESS-TIMESTAMP': timestamp,
+            'ACCESS-PASSPHASE': this.passphrase,
             'Content-Type': 'application/json'
         }
 

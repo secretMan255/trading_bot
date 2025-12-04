@@ -5,7 +5,7 @@ import { validatePipe } from 'src/utils'
 import { PlaceOrderDto } from './webhook.dto'
 import { JwtAuthGuard } from 'src/guard/auth/jwt.auth.guard'
 
-@Controller('tv-webhook')
+@Controller('bitget')
 export class WebhookController {
     // private readonly secret: string
 
@@ -16,17 +16,32 @@ export class WebhookController {
         // this.secret = this.config.get('TV_WEBHOOK_SECRET') || ''
     }
 
-    @Post()
+    @Post('placeOrder/future')
     @UseGuards(JwtAuthGuard)
     @UsePipes(validatePipe)
-    async onSignal(@Body() body: PlaceOrderDto) {
+    async placeFutureOrder(@Body() body: PlaceOrderDto) {
         // if (body.secret !== this.secret) throw new UnauthorizedException('Invalid Secret')
-        const res = await this.bitgetService.placeOrder({
+        const res = await this.bitgetService.placeFutureOrder({
             symbol: body.symbol,
             side: body.side,
+            orderType: body.orderType,
             size: Number(body.qty)
         })
 
-        return { status: 0, bitget: res }
+        return { status: 0, data: res }
+    }
+
+    @Post('placeOrder/spot')
+    @UseGuards(JwtAuthGuard)
+    @UsePipes(validatePipe)
+    async placeSpotOrder(@Body() body: PlaceOrderDto) {
+        const res = await this.bitgetService.placeSpotORder({
+            symbol: body.symbol,
+            side: body.side,
+            orderType: body.orderType,
+            size: Number(body.qty)
+        })
+
+        return { status: 0, data: res }
     }
 }
