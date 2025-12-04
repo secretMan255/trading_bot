@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, UnauthorizedException, UseGuards, UsePipes } from '@nestjs/common'
+import { Body, Controller, Get, Param, Post, Query, UnauthorizedException, UseGuards, UsePipes } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { BitgetService } from './bitget.service'
 import { validatePipe } from 'src/utils'
@@ -14,6 +14,16 @@ export class WebhookController {
         private readonly bitgetService: BitgetService
     ) {
         // this.secret = this.config.get('TV_WEBHOOK_SECRET') || ''
+    }
+
+    @Get('tickers/spot')
+    async getSpotTickers(@Query('symbol') symbol?: string) {
+        return { status: 0, data: await this.bitgetService.getSpotTikets(symbol) }
+    }
+
+    @Get('ticker/future')
+    async getFutureTicker(@Query('productType') productType: string, @Query('symbol') symbol: string) {
+        return { status: 0, data: await this.bitgetService.getFutureTicker(productType, symbol) }
     }
 
     @Get('transactions/spot')

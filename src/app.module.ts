@@ -7,7 +7,6 @@ import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { WebhookModule } from './webhook/webhook.model';
 
-
 @Module({
   imports: [
     ThrottlerModule.forRoot({

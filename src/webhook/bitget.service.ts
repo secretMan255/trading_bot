@@ -23,6 +23,22 @@ export class BitgetService {
         return crypto.createHmac('sha256', this.secret).update(`${timestamp}${method.toUpperCase()}${requestPath}${body}`).digest('base64')
     }
 
+    public async getSpotTikets(symbol?: string) {
+        let url: string = `${this.baseUrl}/api/v2/spot/market/tickers`
+        if (symbol) url += `?symbol=${encodeURIComponent(symbol)}`
+
+        const res = await axios.get(url)
+        return res.data
+    }
+
+    public async getFutureTicker(productType: string, symbol: string) {
+        let url: string = `${this.baseUrl}/api/v2/mix/market/tickers`
+        if (symbol) url += `?productType=${encodeURIComponent(productType)}&symbol=${encodeURIComponent(symbol)}`
+
+        const res = await axios.get(url)
+        return res.data
+    }
+
     public async getSpotTransactions(params: GetTransactionsDto) {
         const requestPath: string = '/api/v2/tax/spot-record'
 

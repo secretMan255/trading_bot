@@ -7,6 +7,7 @@ import { AppController } from 'src/app.controller';
 import { AppService } from 'src/app.service';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard } from '@nestjs/throttler';
+import { WebhookModule } from 'src/webhook/webhook.model';
 
 @Module({
     imports: [
@@ -21,7 +22,8 @@ import { ThrottlerGuard } from '@nestjs/throttler';
                     retryDelay: 3000,
                 };
             },
-        })
+        }),
+        WebhookModule
     ],
     controllers: [AppController],
     providers: [

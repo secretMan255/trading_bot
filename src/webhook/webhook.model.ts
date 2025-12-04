@@ -19,6 +19,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
             },
         }), ConfigModule],
     controllers: [WebhookController],
-    providers: [BitgetService]
+    providers: [BitgetService],
+    exports: [BitgetService]
 })
 export class WebhookModule { }
