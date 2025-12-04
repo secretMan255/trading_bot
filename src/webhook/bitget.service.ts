@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 import * as crypto from 'crypto'
-import { PlaceOrder } from './webhook.dto';
+import { GetTransactionDto, PlaceOrder } from './webhook.dto';
 
 @Injectable()
 export class BitgetService {
@@ -20,7 +20,34 @@ export class BitgetService {
     }
 
     private sign(timestamp: string, method: string, requestPath: string, body = '') {
-        return crypto.createHmac('sha256', this.secret).update(`${timestamp}${method}${requestPath}${body}`).digest('base64')
+        return crypto.createHmac('sha256', this.secret).update(`${timestamp}${method.toUpperCase()}${requestPath}${body}`).digest('base64')
+    }
+
+    public async getSpotTransactions(params: GetTransactionDto) {
+        const requestPath: string = '/api/v2/tax/spot-record'
+
+        const query: Record<string, string> = {
+            startTime: params.startTime,
+        }
+        if (params.endTime) query.endTime = params.endTime
+        if (params.limit) query.limit = params.limit
+        if (params.coin) query.coin = params.coin
+        if (params.idLessThan) query.idLessThan = params.idLessThan
+
+        const queryString: string = new URLSearchParams(query).toString()
+        const pathForSign: string = `${requestPath}?${queryString}`
+        const timestamp: string = Date.now().toString()
+
+        const headers: Record<string, string> = {
+            'ACCESS-KEY': this.apiKey,
+            'ACCESS-SIGN': this.sign(timestamp, 'GET', pathForSign, ''),
+            'ACCESS-TIMESTAMP': timestamp,
+            'ACCESS-PASSPHRASE': this.passphrase,
+            'Content-Type': 'application/json'
+        }
+
+        const res = await axios.get(`${this.baseUrl}${pathForSign}`, { headers })
+        return res.data
     }
 
     public async placeFutureOrder({ symbol, side, orderType, size }: PlaceOrder) {

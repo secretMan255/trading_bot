@@ -2,7 +2,8 @@ import {
     IsString,
     IsNotEmpty,
     IsNumber,
-    IsEnum
+    IsEnum,
+    IsOptional
 } from 'class-validator';
 
 export enum OrderSide {
@@ -20,6 +21,28 @@ export interface PlaceOrder {
     side: OrderSide
     orderType: OrderType
     size: number
+}
+
+export class GetTransactionDto {
+    @IsString()
+    @IsOptional()
+    coin: string
+
+    @IsString()
+    @IsNotEmpty()
+    startTime: string
+
+    @IsString()
+    @IsOptional()
+    endTime: string
+
+    @IsString()
+    @IsOptional()
+    limit: string
+
+    @IsString()
+    @IsOptional()
+    idLessThan: string
 }
 
 export class PlaceOrderDto {
