@@ -10,6 +10,12 @@ export class AppCronService {
         private readonly bitgetService: BitgetService
     ) { }
 
+    @Cron('* 1 * * * *', { name: 'account overall' })
+    async AccountOverall() {
+        const accountOverall = await this.bitgetService.getAccountOverall()
+        // console.log('account: ', accountOverall)
+    }
+
     @Cron('59 * * * * *', { name: 'BTC Ticker' })
     async BTCSpotTicker() {
         const spot = await this.bitgetService.getSpotTikets('BTCUSDT')

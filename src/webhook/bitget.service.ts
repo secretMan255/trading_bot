@@ -23,6 +23,22 @@ export class BitgetService {
         return crypto.createHmac('sha256', this.secret).update(`${timestamp}${method.toUpperCase()}${requestPath}${body}`).digest('base64')
     }
 
+    public async getAccountOverall() {
+        const requestPath: string = '/api/v2/account/all-account-balance'
+        const url: string = this.baseUrl + requestPath
+        const timestamp: string = Date.now().toString()
+
+        const headers: Record<string, string> = {
+            'ACCESS-KEY': this.apiKey,
+            'ACCESS-SIGN': this.sign(timestamp, 'GET', requestPath, ''),
+            'ACCESS-TIMESTAMP': timestamp,
+            'ACCESS-PASSPHRASE': this.passphrase
+        }
+
+        const res = await axios.get(url, { headers })
+        return res.data
+    }
+
     public async getSpotTikets(symbol?: string) {
         let url: string = `${this.baseUrl}/api/v2/spot/market/tickers`
         if (symbol) url += `?symbol=${encodeURIComponent(symbol)}`
@@ -116,7 +132,8 @@ export class BitgetService {
             'ACCESS-SIGN': this.sign(timestamp, 'POST', requestPath, JSON.stringify(bodyObj)),
             'ACCESS-TIMESTAMP': timestamp,
             'ACCESS-PASSPHRASE': this.passphrase,
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            paptrading: '1'
         }
 
         const res = await axios.post(url, bodyObj, { headers })
@@ -141,7 +158,8 @@ export class BitgetService {
             'ACCESS-SIGN': this.sign(timestamp, 'POST', requestPath, JSON.stringify(bodyObj)),
             'ACCESS-TIMESTAMP': timestamp,
             'ACCESS-PASSPHASE': this.passphrase,
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            paptrading: '1'
         }
 
         const res = await axios.post(url, bodyObj, { headers })
