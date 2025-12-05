@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common'
-import { WebhookController } from './webhook.controller'
+import { BitgetController } from './bitget.controller'
 import { BitgetService } from './bitget.service'
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -19,8 +19,8 @@ import { JwtStrategy } from 'src/guard/auth/jwt.guard';
                 };
             },
         }), ConfigModule],
-    controllers: [WebhookController],
+    controllers: [BitgetController],
     providers: [BitgetService, JwtStrategy],
     exports: [BitgetService]
 })
-export class WebhookModule { }
+export class BitgetModule { }

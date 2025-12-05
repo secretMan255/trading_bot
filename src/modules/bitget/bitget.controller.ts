@@ -2,11 +2,11 @@ import { Body, Controller, Get, Param, Post, Query, UnauthorizedException, UseGu
 import { ConfigService } from '@nestjs/config'
 import { BitgetService } from './bitget.service'
 import { validatePipe } from 'src/utils'
-import { GetTransactionsDto, PlaceOrderDto } from './webhook.dto'
+import { GetTransactionsDto, PlaceOrderDto } from './bitget.dto'
 import { JwtAuthGuard } from 'src/guard/auth/jwt.auth.guard'
 
 @Controller('bitget')
-export class WebhookController {
+export class BitgetController {
     // private readonly secret: string
 
     constructor(

@@ -1,1 +1,2 @@
-export * from './mysql.modules'
+export * from './mysql.module'
+export * from './bitget/bitget.model'

@@ -7,7 +7,7 @@ import { AppController } from 'src/app.controller';
 import { AppService } from 'src/app.service';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard } from '@nestjs/throttler';
-import { WebhookModule } from 'src/webhook/webhook.model';
+import { BitgetModule } from 'src/modules/bitget/bitget.model';
 
 @Module({
     imports: [
@@ -23,7 +23,7 @@ import { WebhookModule } from 'src/webhook/webhook.model';
                 };
             },
         }),
-        WebhookModule
+        BitgetModule
     ],
     controllers: [AppController],
     providers: [

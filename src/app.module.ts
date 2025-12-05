@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { MysqlModule } from './modules';
+import { MysqlModule, BitgetModule } from './modules';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ConfigModule } from '@nestjs/config';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { WebhookModule } from './webhook/webhook.model';
 import { APP_GUARD } from '@nestjs/core';
 
 @Module({
@@ -24,7 +23,7 @@ import { APP_GUARD } from '@nestjs/core';
     }),
     ScheduleModule.forRoot(),
     MysqlModule,
-    WebhookModule
+    BitgetModule
   ],
   controllers: [AppController],
   providers: [AppService, {

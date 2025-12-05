@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 import * as crypto from 'crypto'
-import { GetTransactionsDto, PlaceOrder } from './webhook.dto';
+import { GetTransactionsDto, PlaceOrder } from './bitget.dto';
 
 @Injectable()
 export class BitgetService {
