@@ -3,6 +3,7 @@ import { WebhookController } from './webhook.controller'
 import { BitgetService } from './bitget.service'
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtStrategy } from 'src/guard/auth/jwt.guard';
 
 @Module({
     imports: [
@@ -19,7 +20,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
             },
         }), ConfigModule],
     controllers: [WebhookController],
-    providers: [BitgetService],
+    providers: [BitgetService, JwtStrategy],
     exports: [BitgetService]
 })
 export class WebhookModule { }

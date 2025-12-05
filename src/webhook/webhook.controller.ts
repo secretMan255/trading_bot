@@ -35,6 +35,24 @@ export class WebhookController {
         return { status: 0, data: res }
     }
 
+    @Get('transactions/order/history')
+    @UseGuards(JwtAuthGuard)
+    @UsePipes(validatePipe)
+    async getTransctionsHistory(@Param() params: GetTransactionsDto) {
+        const res = await this.bitgetService.getHistoryOrder(params)
+
+        return { status: 0, data: res }
+    }
+
+    @Get('transactions/order/unfilled')
+    @UseGuards(JwtAuthGuard)
+    @UsePipes(validatePipe)
+    async getUnfilledOrder(@Param() params: GetTransactionsDto) {
+        const res = await this.bitgetService.getUnfilledOrder(params)
+
+        return { status: 0, data: res }
+    }
+
     @Get('transactions/future')
     @UseGuards(JwtAuthGuard)
     @UsePipes(validatePipe)

@@ -25,7 +25,6 @@ export class BitgetService {
 
     public async getAccountOverall() {
         const requestPath: string = '/api/v2/account/all-account-balance'
-        const url: string = this.baseUrl + requestPath
         const timestamp: string = Date.now().toString()
 
         const headers: Record<string, string> = {
@@ -35,39 +34,93 @@ export class BitgetService {
             'ACCESS-PASSPHRASE': this.passphrase
         }
 
-        const res = await axios.get(url, { headers })
+        const res = await axios.get(this.baseUrl + requestPath, { headers })
         return res.data
     }
+
+
 
     public async getSpotTikets(symbol?: string) {
         let url: string = `${this.baseUrl}/api/v2/spot/market/tickers`
         if (symbol) url += `?symbol=${encodeURIComponent(symbol)}`
-
+        console.log('url: ', url)
         const res = await axios.get(url)
         return res.data
     }
 
     public async getFutureTicker(productType: string, symbol: string) {
-        let url: string = `${this.baseUrl}/api/v2/mix/market/tickers`
+        let url: string = `${this.baseUrl}/api/v2/mix/market/ticker`
         if (symbol) url += `?productType=${encodeURIComponent(productType)}&symbol=${encodeURIComponent(symbol)}`
 
         const res = await axios.get(url)
+
+        return res.data
+    }
+
+    public async getHistoryOrder(params?: GetTransactionsDto) {
+        const requestPath: string = '/api/v2/spot/trade/history-orders'
+        const timestamp: string = Date.now().toString()
+
+        const query: Record<string, string> = {}
+
+        if (params?.symbol) query.symbol = params.symbol
+        if (params?.startTime) query.startTime = params.startTime
+        if (params?.endTime) query.endTime = params.endTime
+
+        const headers: Record<string, string> = {
+            'ACCESS-KEY': this.apiKey,
+            'ACCESS-SIGN': this.sign(timestamp, 'GET', requestPath, ''),
+            'ACCESS-TIMESTAMP': timestamp,
+            'ACCESS-PASSPHRASE': this.passphrase,
+            'Content-Type': 'application/json',
+            'paptrading': '1' // demo trading
+        }
+
+        const res = await axios.get(this.baseUrl + requestPath, { headers })
+        return res.data
+    }
+
+    public async getUnfilledOrder(params?: GetTransactionsDto) {
+        const query: Record<string, string> = {}
+        if (params?.symbol) query.symbol = params.symbol
+        if (params?.startTime) query.startTime = params.startTime
+        if (params?.endTime) query.endTime = params.endTime
+        if (params?.idLessThan) query.idLessThan = params.idLessThan
+        if (params?.limit) query.limit = params.limit
+        if (params?.orderId) query.orderId = params.orderId
+        if (params?.tpslType) query.tpslType = params.tpslType
+        if (params?.requestTime) query.requestTime = params.requestTime
+        if (params?.receiveWindow) query.receiveWindow = params.receiveWindow
+
+        const queryString: string = new URLSearchParams(query).toString()
+        const pathForSign: string = `/api/v2/spot/trade/unfilled-orders?${queryString}`
+        const timestamp: string = Date.now().toString()
+
+        const headers: Record<string, string> = {
+            'ACCESS-KEY': this.apiKey,
+            'ACCESS-SIGN': this.sign(timestamp, 'GET', pathForSign, ''),
+            'ACCESS-PASSPHRASE': this.passphrase,
+            'ACCESS-TIMESTAMP': timestamp,
+            'locale': 'en-US',
+            'Content-Type': 'application/json',
+            'paptrading': '1' // demo trading
+        }
+
+        const res = await axios.get(this.baseUrl + pathForSign, { headers })
         return res.data
     }
 
     public async getSpotTransactions(params: GetTransactionsDto) {
-        const requestPath: string = '/api/v2/tax/spot-record'
-
         const query: Record<string, string> = {
             startTime: params.startTime,
         }
-        if (params.endTime) query.endTime = params.endTime
-        if (params.limit) query.limit = params.limit
-        if (params.coin) query.coin = params.coin
-        if (params.idLessThan) query.idLessThan = params.idLessThan
+        if (params?.endTime) query.endTime = params.endTime
+        if (params?.limit) query.limit = params.limit
+        if (params?.coin) query.coin = params.coin
+        if (params?.idLessThan) query.idLessThan = params.idLessThan
 
         const queryString: string = new URLSearchParams(query).toString()
-        const pathForSign: string = `${requestPath}?${queryString}`
+        const pathForSign: string = `/api/v2/tax/spot-record?${queryString}`
         const timestamp: string = Date.now().toString()
 
         const headers: Record<string, string> = {
@@ -84,20 +137,18 @@ export class BitgetService {
     }
 
     public async getFutureTransactions(params: GetTransactionsDto) {
-        const requestPath: string = '/api/v2/tax/future-record'
-
         const query: Record<string, string> = {
             startTime: params.startTime,
             endTime: params.endTime
         }
 
-        if (params.productType) query.productType = params.productType
-        if (params.marginCoin) query.marginCoin = params.marginCoin
-        if (params.limit) query.limit = params.limit
-        if (params.idLessThan) query.idLessThan = params.idLessThan
+        if (params?.productType) query.productType = params.productType
+        if (params?.marginCoin) query.marginCoin = params.marginCoin
+        if (params?.limit) query.limit = params.limit
+        if (params?.idLessThan) query.idLessThan = params.idLessThan
 
         const queryString: string = new URLSearchParams(query).toString()
-        const pathForSign: string = `${requestPath}?${queryString}`
+        const pathForSign: string = `/api/v2/tax/future-record?${queryString}`
         const timestamp: string = Date.now().toString()
 
         const headers: Record<string, string> = {
@@ -114,7 +165,7 @@ export class BitgetService {
     }
 
     public async placeFutureOrder({ symbol, side, orderType, size }: PlaceOrder) {
-        const requestPath: string = '/api/mix/v1/order/placeOrder'
+        const requestPath: string = '/api/mix/v2/order/placeOrder'
         const url: string = this.baseUrl + requestPath
         const timestamp: string = Date.now().toString()
 
@@ -141,7 +192,7 @@ export class BitgetService {
     }
 
     public async placeSpotORder({ symbol, side, orderType, size }: PlaceOrder) {
-        const requestPath: string = '/api/spot/v1/trade/placeOrder'
+        const requestPath: string = '/api/spot/v2/trade/placeOrder'
         const url: string = this.baseUrl + requestPath
         const timestamp: string = Date.now().toString()
 

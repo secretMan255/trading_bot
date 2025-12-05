@@ -26,6 +26,10 @@ export interface PlaceOrder {
 export class GetTransactionsDto {
     @IsString()
     @IsOptional()
+    symbol: string
+
+    @IsString()
+    @IsOptional()
     productType: string
 
     @IsString()
@@ -37,7 +41,7 @@ export class GetTransactionsDto {
     coin: string
 
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     startTime: string
 
     @IsString()
@@ -51,6 +55,22 @@ export class GetTransactionsDto {
     @IsString()
     @IsOptional()
     idLessThan: string
+
+    @IsString()
+    @IsOptional()
+    orderId: string
+
+    @IsString()
+    @IsOptional()
+    tpslType: string
+
+    @IsString()
+    @IsOptional()
+    requestTime: string
+
+    @IsString()
+    @IsOptional()
+    receiveWindow: string
 }
 
 export class PlaceOrderDto {
