@@ -13,7 +13,6 @@ export class BitgetService {
 
     constructor(private readonly config: ConfigService) {
         this.apiKey = this.config.get('BITGET_API_KEY') || ''
-        this.secret = this.config.get('') || ''
         this.secret = this.config.get('BITGET_API_SECRET') || ''
         this.passphrase = this.config.get('BITGET_PASSPHRASE') || ''
         this.baseUrl = this.config.get('BITGET_BASE_URL') || 'https://api.bitget.com'
@@ -43,7 +42,7 @@ export class BitgetService {
     public async getSpotTikets(symbol?: string) {
         let url: string = `${this.baseUrl}/api/v2/spot/market/tickers`
         if (symbol) url += `?symbol=${encodeURIComponent(symbol)}`
-        console.log('url: ', url)
+
         const res = await axios.get(url)
         return res.data
     }
@@ -67,6 +66,8 @@ export class BitgetService {
         if (params?.startTime) query.startTime = params.startTime
         if (params?.endTime) query.endTime = params.endTime
 
+        const queryString: string = new URLSearchParams(query).toString()
+
         const headers: Record<string, string> = {
             'ACCESS-KEY': this.apiKey,
             'ACCESS-SIGN': this.sign(timestamp, 'GET', requestPath, ''),
@@ -76,11 +77,12 @@ export class BitgetService {
             'paptrading': '1' // demo trading
         }
 
-        const res = await axios.get(this.baseUrl + requestPath, { headers })
+        const res = await axios.get(this.baseUrl + `${requestPath}?${queryString}`, { headers })
         return res.data
     }
 
     public async getUnfilledOrder(params?: GetTransactionsDto) {
+        const requestPath: string = '/api/v2/spot/trade/unfilled-orders'
         const query: Record<string, string> = {}
         if (params?.symbol) query.symbol = params.symbol
         if (params?.startTime) query.startTime = params.startTime
@@ -93,12 +95,11 @@ export class BitgetService {
         if (params?.receiveWindow) query.receiveWindow = params.receiveWindow
 
         const queryString: string = new URLSearchParams(query).toString()
-        const pathForSign: string = `/api/v2/spot/trade/unfilled-orders?${queryString}`
         const timestamp: string = Date.now().toString()
 
         const headers: Record<string, string> = {
             'ACCESS-KEY': this.apiKey,
-            'ACCESS-SIGN': this.sign(timestamp, 'GET', pathForSign, ''),
+            'ACCESS-SIGN': this.sign(timestamp, 'GET', requestPath, ''),
             'ACCESS-PASSPHRASE': this.passphrase,
             'ACCESS-TIMESTAMP': timestamp,
             'locale': 'en-US',
@@ -106,11 +107,12 @@ export class BitgetService {
             'paptrading': '1' // demo trading
         }
 
-        const res = await axios.get(this.baseUrl + pathForSign, { headers })
+        const res = await axios.get(this.baseUrl + `${requestPath}?${queryString}`, { headers })
         return res.data
     }
 
     public async getSpotTransactions(params: GetTransactionsDto) {
+        const requestPath: string = '/api/v2/tax/spot-record'
         const query: Record<string, string> = {
             startTime: params.startTime,
         }
@@ -120,23 +122,23 @@ export class BitgetService {
         if (params?.idLessThan) query.idLessThan = params.idLessThan
 
         const queryString: string = new URLSearchParams(query).toString()
-        const pathForSign: string = `/api/v2/tax/spot-record?${queryString}`
         const timestamp: string = Date.now().toString()
 
         const headers: Record<string, string> = {
             'ACCESS-KEY': this.apiKey,
-            'ACCESS-SIGN': this.sign(timestamp, 'GET', pathForSign, ''),
+            'ACCESS-SIGN': this.sign(timestamp, 'GET', requestPath, ''),
             'ACCESS-TIMESTAMP': timestamp,
             'ACCESS-PASSPHRASE': this.passphrase,
             'locate': 'en-US',
             'Content-Type': 'application/json'
         }
 
-        const res = await axios.get(`${this.baseUrl}${pathForSign}`, { headers })
+        const res = await axios.get(`${this.baseUrl}${requestPath}?${queryString}`, { headers })
         return res.data
     }
 
     public async getFutureTransactions(params: GetTransactionsDto) {
+        const requestPath: string = '/api/v2/tax/future-record'
         const query: Record<string, string> = {
             startTime: params.startTime,
             endTime: params.endTime
@@ -148,19 +150,18 @@ export class BitgetService {
         if (params?.idLessThan) query.idLessThan = params.idLessThan
 
         const queryString: string = new URLSearchParams(query).toString()
-        const pathForSign: string = `/api/v2/tax/future-record?${queryString}`
         const timestamp: string = Date.now().toString()
 
         const headers: Record<string, string> = {
             'ACCESS-KEY': this.apiKey,
-            'ACCESS-SIGN': this.sign(timestamp, 'GET', pathForSign, ''),
+            'ACCESS-SIGN': this.sign(timestamp, 'GET', requestPath, ''),
             'ACCESS-TIMESTAMP': timestamp,
             'ACCESS-PASSPHRASE': this.passphrase,
             'locate': 'en-US',
             'Content-Type': 'application/json'
         }
 
-        const res = await axios.get(`${this.baseUrl}${pathForSign}`, { headers })
+        const res = await axios.get(`${this.baseUrl}${requestPath}?${queryString}`, { headers })
         return res.data
     }
 
