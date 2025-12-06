@@ -10,12 +10,14 @@ export class BitgetService {
     private readonly secret: string
     private readonly passphrase: string
     private readonly baseUrl: string
+    private readonly demoMode: boolean
 
     constructor(private readonly config: ConfigService) {
         this.apiKey = this.config.get('BITGET_API_KEY') || ''
         this.secret = this.config.get('BITGET_API_SECRET') || ''
         this.passphrase = this.config.get('BITGET_PASSPHRASE') || ''
         this.baseUrl = this.config.get('BITGET_BASE_URL') || 'https://api.bitget.com'
+        this.demoMode = this.config.get('BITGET_DEMO') || false
     }
 
     private signature(timestamp: string, method: 'GET' | 'POST', requestPath: string, queryString?: string, body?: any) {
@@ -25,7 +27,7 @@ export class BitgetService {
         return crypto.createHmac('sha256', this.secret).update(`${timestamp}${method.toUpperCase()}${requestPath}${qs}${bodyStr}`).digest('base64')
     }
 
-    public async get(requestPath: string, queryString: string, demo: boolean = false) {
+    public async get(requestPath: string, queryString?: string) {
         const timestamp = Date.now().toString()
         const headers: Record<string, string> = {
             'ACCESS-KEY': this.apiKey,
@@ -36,13 +38,12 @@ export class BitgetService {
             'Content-Type': 'application/json',
         }
 
-        if (demo) headers.paptrading = '1'
+        if (this.demoMode) headers.paptrading = '1'
         const rq: string = queryString ? `${requestPath}?${queryString}` : requestPath
-
         return await axios.get(this.baseUrl + rq, { headers })
     }
 
-    public async post(requestPath: string, body: any, demo: boolean = false) {
+    public async post(requestPath: string, body: any) {
         const timestamp = Date.now().toString()
         const headers: Record<string, string> = {
             'ACCESS-KEY': this.apiKey,
@@ -53,13 +54,14 @@ export class BitgetService {
             'Content-Type': 'application/json',
         }
 
-        if (demo) headers.paptrading = '1'
+        if (this.demoMode) headers.paptrading = '1'
         return await axios.post(this.baseUrl + requestPath, body, { headers })
     }
 
     public async getAccountOverall() {
-        const res = await this.get('/api/v2/account/all-account-balance', '')
-        return res.data
+        const spot = await this.get('/api/v2/spot/account/assets')
+        const future = await this.get('/api/v2/mix/account/accounts?productType=USDT-FUTURES')
+        return { spot: spot.data.data, future: future.data.data }
     }
 
     public async getSpotTikets(symbol?: string) {
@@ -87,7 +89,7 @@ export class BitgetService {
 
         const queryString: string = new URLSearchParams(query).toString()
 
-        const res = await this.get('/api/v2/spot/trade/history-orders', queryString, true)
+        const res = await this.get('/api/v2/spot/trade/history-orders', queryString)
         return res.data
     }
 
@@ -106,7 +108,7 @@ export class BitgetService {
 
         const queryString: string = new URLSearchParams(query).toString()
 
-        const res = await this.get('/api/v2/spot/trade/unfilled-orders', queryString, true)
+        const res = await this.get('/api/v2/spot/trade/unfilled-orders', queryString)
         return res.data
     }
 
@@ -152,7 +154,7 @@ export class BitgetService {
             productType: 'UMCBL'
         }
 
-        const res = await this.post('/api/v2/mix/order/place-order', bodyObj, true)
+        const res = await this.post('/api/v2/mix/order/place-order', bodyObj)
         return res.data
     }
 
@@ -165,7 +167,7 @@ export class BitgetService {
             quantity: size.toString()
         }
 
-        const res = await this.post('/api/spot/v2/trade/place-order', bodyObj, true)
+        const res = await this.post('/api/spot/v2/trade/place-order', bodyObj)
         return res.data
     }
 }
