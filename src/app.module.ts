@@ -6,6 +6,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { ConfigModule } from '@nestjs/config';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { AppCronService } from './app.cron.service';
 
 @Module({
   imports: [
@@ -26,7 +27,7 @@ import { APP_GUARD } from '@nestjs/core';
     BitgetModule
   ],
   controllers: [AppController],
-  providers: [AppService, {
+  providers: [AppService, AppCronService, {
     provide: APP_GUARD,
     useClass: ThrottlerGuard
   }],
