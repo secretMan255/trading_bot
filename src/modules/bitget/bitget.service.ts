@@ -80,6 +80,27 @@ export class BitgetService {
         return res.data
     }
 
+    public async getFutureCandles(symbol: string, granularity: number, limit: number = 500) {
+        const params = new URLSearchParams({
+            symbol,
+            productType: 'USDT-FUTURES',
+            granularity: String(granularity),
+            limit: String(limit),
+        })
+
+        const res = await axios.get(`${this.baseUrl}/api/v2/mix/market/candles?${params.toString()}`)
+        const sorted = res.data.data.slice().reverse()
+
+        return sorted.map((r) => ({
+            ts: Number(r[0]),
+            open: Number(r[1]),
+            high: Number(r[2]),
+            low: Number(r[3]),
+            close: Number(r[4]),
+            volume: Number(r[5] ?? 0)
+        }))
+    }
+
     public async getHistoryOrder(params?: GetTransactionsDto) {
         const query: Record<string, string> = {}
 
