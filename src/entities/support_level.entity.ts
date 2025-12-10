@@ -1,14 +1,13 @@
-import { Column, Entity, Index, PrimaryColumn } from 'typeorm';
+import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('support_level')
 @Index(['symbol', 'timeframe'])
 export class SupportLevelEntity {
-    @PrimaryColumn({
-        name: 'id',
+    @PrimaryGeneratedColumn({
         type: 'bigint',
-        unsigned: true
+        unsigned: true,
     })
-    id: number
+    id: number;
 
     @Column({ length: 10 })
     symbol: string
