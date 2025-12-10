@@ -1,1 +1,1 @@
-export * from './support_level'
+export * from './support_level.entity'
