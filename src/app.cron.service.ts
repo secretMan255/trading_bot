@@ -52,4 +52,15 @@ export class AppCronService {
         const res = await this.bitgetService.getAccountOverall()
         console.log(res)
     }
+
+    // @Cron('*/5 * * * * *')
+    // async oneHourSuppoerLevel() {
+    //     const symbols: string[] = ['BTCUSDT', 'ETHUSDT']
+
+    //     for (const symbol of symbols) {
+    //         const res = await this.bitgetService.getFutureCandles(symbol, 3600)
+    //         this.logger.log(`1H ${symbol} Support Level`)
+    //         console.log(res)
+    //     }
+    // }
 }
